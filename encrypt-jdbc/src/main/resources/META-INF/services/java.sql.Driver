@@ -15,8 +15,4 @@
 # limitations under the License.
 #
 
-org.apache.shardingsphere.encrypt.algorithm.standard.AESEncryptAlgorithm
-org.apache.shardingsphere.encrypt.algorithm.assisted.MD5AssistedEncryptAlgorithm
-
-org.apache.shardingsphere.encrypt.algorithm.standard.SM4EncryptAlgorithm
-org.apache.shardingsphere.encrypt.algorithm.assisted.SM3AssistedEncryptAlgorithm
+org.apache.shardingsphere.driver.ShardingSphereDriver

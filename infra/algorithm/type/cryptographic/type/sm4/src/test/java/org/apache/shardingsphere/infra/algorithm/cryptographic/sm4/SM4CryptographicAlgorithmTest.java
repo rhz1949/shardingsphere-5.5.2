@@ -57,7 +57,7 @@ class SM4CryptographicAlgorithmTest {
     
     @Test
     void assertCreateNewInstanceWithEmptyDigestAlgorithm() {
-        assertThrows(AlgorithmInitializationException.class, () -> cryptographicAlgorithm.init(
+        assertThrows(IllegalArgumentException.class, () -> cryptographicAlgorithm.init(
                 PropertiesBuilder.build(new Property("sm4-key-value", "123456abc"), new Property("digest-algorithm-name", ""))));
     }
     

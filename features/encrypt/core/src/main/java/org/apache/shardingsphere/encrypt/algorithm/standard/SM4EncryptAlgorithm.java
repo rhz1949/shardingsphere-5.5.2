@@ -28,7 +28,7 @@
  import java.util.Properties;
  
  /**
-  * AES encrypt algorithm.
+  * SM4 encrypt algorithm.
   */
  public final class SM4EncryptAlgorithm implements EncryptAlgorithm {
      

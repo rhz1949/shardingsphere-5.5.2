@@ -28,7 +28,7 @@ import org.apache.shardingsphere.infra.spi.type.typed.TypedSPILoader;
 import java.util.Properties;
 
 /**
- * MD5 assisted encrypt algorithm.
+ * SM3 assisted encrypt algorithm.
  */
 public final class SM3AssistedEncryptAlgorithm implements EncryptAlgorithm {
     
@@ -62,6 +62,6 @@ public final class SM3AssistedEncryptAlgorithm implements EncryptAlgorithm {
     
     @Override
     public String getType() {
-        return "MD5";
+        return "SM3";
     }
 }

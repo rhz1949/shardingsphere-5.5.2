@@ -1,0 +1,90 @@
+# ShardingSphere 最小化加密配置示例
+# 仅包含数据库连接和加密规则，不包含其他功能
+
+dataSources:
+  # 数据源配置
+  primary_ds:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/encrypt_demo?useSSL=false&serverTimezone=UTC
+    username: root
+    password: root
+    # 连接池配置（可选）
+    maximumPoolSize: 10
+    minimumIdle: 2
+    connectionTimeout: 30000
+
+# 规则配置 - 仅包含加密规则
+rules:
+- !ENCRYPT
+  # 加密表配置
+  tables:
+    # 用户表
+    t_user:
+      columns:
+        # 密码字段 - 使用AES加密
+        password:
+          cipherColumn: password_cipher
+          encryptorName: aes_encryptor
+        
+        # 手机号字段 - 使用SM4加密
+        phone:
+          cipherColumn: phone_cipher
+          encryptorName: sm4_encryptor
+        
+        # 身份证号 - 使用AES加密 + MD5辅助查询
+        id_card:
+          cipherColumn: id_card_cipher
+          assistedQueryColumn: id_card_assisted
+          encryptorName: aes_encryptor
+          assistedQueryEncryptorName: md5_encryptor
+        
+        # 邮箱 - 使用AES加密 + SM3辅助查询  
+        email:
+          cipherColumn: email_cipher
+          assistedQueryColumn: email_assisted
+          encryptorName: aes_encryptor
+          assistedQueryEncryptorName: sm3_encryptor
+    
+    # 订单表
+    t_order:
+      columns:
+        # 订单备注 - 敏感信息加密
+        remark:
+          cipherColumn: remark_cipher
+          encryptorName: sm4_encryptor
+  
+  # 加密算法配置
+  encryptors:
+    # AES加密器
+    aes_encryptor:
+      type: AES
+      props:
+        # AES密钥 - 请使用32字符的密钥
+        aes-key-value: your-32-character-aes-secret-key
+        
+    # SM4国密加密器
+    sm4_encryptor:
+      type: SM4
+      props:
+        # SM4密钥 - 16字节密钥
+        sm4-key: your16byteskey12
+        sm4-mode: ECB
+        sm4-padding: PKCS7Padding
+        
+    # MD5辅助查询加密器
+    md5_encryptor:
+      type: MD5
+      
+    # SM3国密哈希加密器
+    sm3_encryptor:
+      type: SM3
+
+# 属性配置（可选）
+props:
+  # 显示SQL（调试用）
+  sql-show: false
+  # SQL注释解析
+  sql-comment-parse-enabled: true
+  # 检查表元数据
+  check-table-metadata-enabled: false

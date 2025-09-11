@@ -1,0 +1,41 @@
+# 测试用配置 - 使用H2内存数据库
+dataSources:
+  test_ds:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: org.h2.Driver
+    jdbcUrl: jdbc:h2:mem:testdb;MODE=MySQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    username: sa
+    password: ""
+
+rules:
+- !ENCRYPT
+  tables:
+    t_user:
+      columns:
+        password:
+          cipherColumn: password_cipher
+          encryptorName: aes_encryptor
+        phone:
+          cipherColumn: phone_cipher
+          encryptorName: sm4_encryptor
+        id_card:
+          cipherColumn: id_card_cipher
+          assistedQueryColumn: id_card_assisted
+          encryptorName: aes_encryptor
+          assistedQueryEncryptorName: md5_encryptor
+  encryptors:
+    aes_encryptor:
+      type: AES
+      props:
+        aes-key-value: test1234567890123456test1234567890
+    sm4_encryptor:
+      type: SM4
+      props:
+        sm4-key: test123456789012
+        sm4-mode: ECB
+        sm4-padding: PKCS7Padding
+    md5_encryptor:
+      type: MD5
+
+props:
+  sql-show: true
