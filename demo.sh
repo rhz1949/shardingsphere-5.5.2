@@ -143,19 +143,39 @@ prepare_demo_environment() {
     print_info "检查必要的依赖JAR..."
     
     # MySQL驱动
-    if [ ! -f "mysql-connector-java.jar" ]; then
+    if [ ! -f "mysql-connector-java.jar" ] || ! jar tf mysql-connector-java.jar >/dev/null 2>&1; then
         print_info "下载MySQL驱动..."
-        curl -s -L -o mysql-connector-java.jar \
-            "https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.33/mysql-connector-java-8.0.33.jar" || \
+        rm -f mysql-connector-java.jar  # 删除损坏的文件
+        if curl -s -L -o mysql-connector-java.jar \
+            "https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.0.33/mysql-connector-j-8.0.33.jar"; then
+            # 验证下载的文件
+            if ! jar tf mysql-connector-java.jar >/dev/null 2>&1; then
+                print_warning "MySQL驱动下载损坏，将跳过"
+                rm -f mysql-connector-java.jar
+            else
+                print_success "MySQL驱动下载成功"
+            fi
+        else
             print_warning "无法下载MySQL驱动，请手动下载"
+        fi
     fi
     
     # HikariCP
-    if [ ! -f "HikariCP.jar" ]; then
+    if [ ! -f "HikariCP.jar" ] || ! jar tf HikariCP.jar >/dev/null 2>&1; then
         print_info "下载HikariCP连接池..."
-        curl -s -L -o HikariCP.jar \
-            "https://repo1.maven.org/maven2/com/zaxxer/HikariCP/4.0.3/HikariCP-4.0.3.jar" || \
+        rm -f HikariCP.jar  # 删除损坏的文件
+        if curl -s -L -o HikariCP.jar \
+            "https://repo1.maven.org/maven2/com/zaxxer/HikariCP/4.0.3/HikariCP-4.0.3.jar"; then
+            # 验证下载的文件
+            if ! jar tf HikariCP.jar >/dev/null 2>&1; then
+                print_warning "HikariCP下载损坏，将跳过"
+                rm -f HikariCP.jar
+            else
+                print_success "HikariCP下载成功"
+            fi
+        else
             print_warning "无法下载HikariCP，请手动下载"
+        fi
     fi
     
     print_success "演示环境准备完成"
@@ -302,11 +322,17 @@ compile_and_run_test() {
             print_warning "无法下载H2数据库"
     fi
     
-    # 构建classpath
+    # 构建classpath - 只包含有效的JAR文件
     CLASSPATH="shardingsphere-encrypt-minimal-5.5.2.jar"
     for jar in *.jar; do
-        if [ "$jar" != "shardingsphere-encrypt-minimal-5.5.2.jar" ]; then
-            CLASSPATH="$CLASSPATH:$jar"
+        if [ "$jar" != "shardingsphere-encrypt-minimal-5.5.2.jar" ] && [ -f "$jar" ]; then
+            # 验证JAR文件是否有效
+            if jar tf "$jar" >/dev/null 2>&1; then
+                CLASSPATH="$CLASSPATH:$jar"
+                print_info "添加到classpath: $jar"
+            else
+                print_warning "跳过损坏的JAR: $jar"
+            fi
         fi
     done
     

@@ -1,0 +1,23 @@
+dataSources:
+  ds:
+    dataSourceClassName: org.h2.jdbcx.JdbcDataSource
+    URL: jdbc:h2:mem:demo;MODE=MySQL
+    user: sa
+    password: ""
+
+rules:
+- !ENCRYPT
+  tables:
+    demo_table:
+      columns:
+        secret_info:
+          cipherColumn: secret_info_cipher
+          encryptorName: demo_aes
+  encryptors:
+    demo_aes:
+      type: AES
+      props:
+        aes-key-value: demo12345678901234567890123456789012
+
+props:
+  sql-show: false
